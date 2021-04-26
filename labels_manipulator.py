@@ -7,6 +7,7 @@ import torch
 from PIL import Image
 import pandas as pd 
 
+
 #Model
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s',pretrained=True)
 model = model.autoshape()
@@ -28,6 +29,7 @@ def super_categ_finder(indexes,value):
             label = 6
     return label
 ############################################################################
+#Selected Classes and Grouping to Super Classes
 person = ['person']
 person_ind = label_locator(person)
 animal = ['bird','cat','dog','horse','sheep','cow','elephant','bear','zebra','giraffe']
@@ -43,42 +45,55 @@ toy_ind = label_locator(toy)
 indexes = [person_ind,animal_ind,book_ind,cuttlery_ind,screen_ind,toy_ind]
 
 ####################################################################################
-"""
-dst_folder = '/home/anam/Codes/yolov5/Coco_Format_Detections'
-src_dir = '/home/anam/Codes/yolov5/runs/detect/exp/labels'
-src_files = '/home/anam/Codes/yolov5/runs/detect/exp/labels/*.txt'
-dst_dir = '/home/anam/Codes/yolov5/QuantEx_Format_Detections'
 
-#files = [i for i in os.listdir(src_dir)]
+base_dir =  '/home/anam/Desktop/Leipzig/Subjects_Data/AgeGroup_003/257498/Video/MPILab_0002_257498_01_P_Video'
+coco_dir = os.path.join(base_dir,'Coco_Detections')
+quantex_dir = os.path.join(base_dir,'QuantEx_Detections')
+labels_dir = os.path.join(base_dir,'labels')
 
-#This part of code is to move files from detections to Coco_Folder
-for f in  sorted(glob.glob(src_files)):
+coco_files = coco_dir + '/*.txt'
+
+for f in sorted(glob.glob(coco_files)):
         path,filename = os.path.split(f)
         filename,ext = os.path.splitext(filename)
         strings = filename.split('_')
         strings[-1] = strings[-1].zfill(4)
-        if (int(strings[-1])%30==0):
-            new_file = 'frame_' + strings[-1]+'.txt'
-            new_file = os.path.join(dst_folder,new_file)
-            os.rename(f,new_file)
-"""
-src_dir = '/home/anam/Codes/yolov5/Coco_Format_Detections'
-src_files = '/home/anam/Codes/yolov5/Coco_Format_Detections/*.txt'
-dst_dir = '/home/anam/Codes/yolov5/QuantEx_Format_Detections'
+        new_file = 'frame_' + strings[-1]+'.txt'
+        new_file = os.path.join(coco_dir,new_file)
+        os.rename(f,new_file)
 
-for src_file in  sorted(glob.glob(src_files)):
+count = 0
+for  src_file in  sorted(glob.glob(coco_files)):
     path,filename = os.path.split(src_file)
-    new_file = os.path.join(dst_dir,filename)
-    with open(src_file) as f:
-        with open(new_file,"a") as fl:
-            for line in f:
-                line_data = line.split()
-                #print(line_data)
-                categ = int(line_data[0])
-                super_cat = super_categ_finder(indexes,categ)
-                line_data[0] = str(super_cat)
-                new_line = " ".join(line_data)
-                new_line.encode("utf8")
-                fl.write(new_line)
-                fl.write('\n')
-            
+    filename,ext = os.path.splitext(filename)
+    strings = filename.split('_')
+    if int(strings[-1])%30==0:
+        fr_num = int(int(strings[-1])/30)
+        cnt = str(fr_num).zfill(4)
+        new_file = 'frame_'+cnt+'.txt'
+        new_file = os.path.join(quantex_dir,new_file)
+        #count+=1
+        with open(src_file) as f:
+            with open(new_file,"a") as fl:
+                for line in f:
+                    line_data = line.split()
+                    #print(line_data)
+                    categ = int(line_data[0])
+                    super_cat = super_categ_finder(indexes,categ)
+                    line_data[0] = str(super_cat)
+                    new_line = " ".join(line_data)
+                    new_line.encode("utf8")
+                    fl.write(new_line)
+                    fl.write('\n')
+
+quantex_files = quantex_dir + '/*.txt'
+tr = 'train.txt'
+train_file = os.path.join(labels_dir,tr)
+for  src_file in  sorted(glob.glob(quantex_files)):
+    path,filename = os.path.split(src_file)
+    data = 'obj_train_data/'+filename
+    with open(train_file,"a") as fl:
+        data.encode("utf8")
+        fl.write(data)
+        fl.write('\n')
+
