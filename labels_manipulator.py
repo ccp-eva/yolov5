@@ -46,7 +46,7 @@ indexes = [person_ind,animal_ind,book_ind,cuttlery_ind,screen_ind,toy_ind]
 
 ####################################################################################
 
-base_dir =  '/home/anam/Desktop/Leipzig/Subjects_Data/AgeGroup_003/257498/Video/MPILab_0002_257498_01_P_Video'
+base_dir =  '/home/anam/Desktop/Leipzig/Subjects_Data/AgeGroup_003/258239/Video/Home_0005_258239'
 coco_dir = os.path.join(base_dir,'Coco_Detections')
 quantex_dir = os.path.join(base_dir,'QuantEx_Detections')
 labels_dir = os.path.join(base_dir,'labels')
